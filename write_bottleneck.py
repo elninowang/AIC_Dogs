@@ -33,8 +33,8 @@ def write_gap(MODEL, image_size, lambda_func=None):
 
     print(MODEL.__name__)
     gen = ImageDataGenerator(
-        featurewise_std_normalization=True,
-        samplewise_std_normalization=False,
+        # featurewise_std_normalization=True,
+        # samplewise_std_normalization=False,
     )
     batch_size = 16
     train_generator = gen.flow_from_directory(os.path.join(dir, "train"), image_size, shuffle=False, batch_size=batch_size, classes=classes, class_mode="categorical")
@@ -58,8 +58,14 @@ def write_gap(MODEL, image_size, lambda_func=None):
         h.create_dataset("label", data=train_generator.classes)
     print("write_gap {} successed".format(Model.__name__))
 
-write_gap(ResNet50, (224, 224))
+def preprocess_input(x):
+    x /= 255.
+    x -= 0.5
+    x *= 2.
+    return x
+
+write_gap(ResNet50, (224, 224), preprocess_input)
 write_gap(Xception, (299, 299), xception.preprocess_input)
 write_gap(InceptionV3, (299, 299), inception_v3.preprocess_input)
-write_gap(VGG16, (224, 224))
-write_gap(VGG19, (224, 224))
+write_gap(VGG16, (224, 224), preprocess_input)
+write_gap(VGG19, (224, 224), preprocess_input)
